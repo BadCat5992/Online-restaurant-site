@@ -1,0 +1,82 @@
+[
+    {
+        "name": "Erdbeer-Smoothie",
+        "price": 3.50
+    },
+    {
+        "name": "Mango-Lassi",
+        "price": 3.00
+    },
+    {
+        "name": "Wassermelonen-Salat",
+        "price": 4.50
+    },
+    {
+        "name": "Hähnchen-Wrap",
+        "price": 6.00
+    },
+    {
+        "name": "Veggie-Burger",
+        "price": 7.00
+    },
+    {
+        "name": "Quinoa-Salat",
+        "price": 5.50
+    },
+    {
+        "name": "Eiskaffee",
+        "price": 2.50
+    },
+    {
+        "name": "Himbeer-Limonade",
+        "price": 2.50
+    },
+    {
+        "name": "Mozzarella-Sticks",
+        "price": 4.00
+    },
+    {
+        "name": "Chicken Nuggets",
+        "price": 5.00
+    },
+    {
+        "name": "Gemüse-Sticks mit Dip",
+        "price": 3.50
+    },
+    {
+        "name": "Mini-Pizzen",
+        "price": 4.50
+    },
+    {
+        "name": "Erdbeer-Tiramisu",
+        "price": 4.00
+    },
+    {
+        "name": "Frozen Yogurt",
+        "price": 3.00
+    },
+    {
+        "name": "Erdnussbutter-Bananen-Smoothie",
+        "price": 3.50
+    },
+    {
+        "name": "Kokoswasser",
+        "price": 2.00
+    },
+    {
+        "name": "Griechischer Salat",
+        "price": 5.00
+    },
+    {
+        "name": "Falafel-Wrap",
+        "price": 6.00
+    },
+    {
+        "name": "Tomaten-Mozzarella-Salat",
+        "price": 4.50
+    },
+    {
+        "name": "Erdbeer-Milchshake",
+        "price": 3.00
+    }
+]

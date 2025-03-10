@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Provisionen</title>
+</head>
+<body>
+    <h1>Provisionen</h1>
+    <div id="commissions"></div>
+    <div id="totalCommission"></div>
+
+    <script>
+        function loadCommissions() {
+            fetch('commissions.json')
+                .then(response => response.json())
+                .then(data => {
+                    const commissionsDiv = document.getElementById('commissions');
+                    const totalCommissionDiv = document.getElementById('totalCommission');
+                    commissionsDiv.innerHTML = '';
+                    let totalCommission = 0;
+
+                    data.forEach(commission => {
+                        totalCommission += commission.commission;
+                        const commissionDiv = document.createElement('div');
+                        commissionDiv.innerHTML = `<p>Tischnummer: ${commission.table}, Produkt: ${commission.product}, Provision: ${commission.commission.toFixed(2)}€</p>`;
+                        commissionsDiv.appendChild(commissionDiv);
+                    });
+
+                    totalCommissionDiv.innerHTML = `<p><strong>Gesamtprovision: ${totalCommission.toFixed(2)}€</strong></p>`;
+                })
+                .catch(error => {
+                    console.error('Fehler:', error);
+                });
+        }
+
+        loadCommissions();
+    </script>
+</body>
+</html>

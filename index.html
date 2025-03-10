@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tischauswahl</title>
+</head>
+<body>
+    <h1>Tischauswahl</h1>
+    <form id="tableForm">
+        <label for="table">Tischnummer:</label>
+        <input type="number" id="table" name="table" required>
+        <button type="submit">Weiter</button>
+    </form>
+
+    <script>
+        document.getElementById('tableForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const tableNumber = document.getElementById('table').value;
+            window.location.href = `bestellen.html?table=${tableNumber}`;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellen</title>
+</head>
+<body>
+    <h1>Bestellen</h1>
+    <div id="tableInfo"></div>
+    <form id="orderForm">
+        <div id="productList"></div>
+        <button id="addProductButton" type="button" onclick="addProduct()">Produkt hinzufügen</button>
+        <button type="submit">Bestellen</button>
+    </form>
+
+    <script>
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+    
+        const tableNumber = getQueryParam('table');
+        document.getElementById('tableInfo').innerText = `Tischnummer: ${tableNumber}`;
+    
+        fetch('products.json')
+            .then(response => response.json())
+            .then(products => {
+                window.products = products;
+                addProduct(); // Füge das erste Produktfeld hinzu
+            })
+            .catch(error => {
+                console.error('Fehler beim Laden der Produkte:', error);
+            });
+    
+        function addProduct() {
+            const productList = document.getElementById('productList');
+            const productDiv = document.createElement('div');
+            productDiv.className = 'product-item';
+    
+            const productSelect = document.createElement('select');
+            productSelect.name = 'product';
+            productSelect.required = true;
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.name;
+                option.textContent = `${product.name} - ${product.price.toFixed(2)}€`;
+                option.dataset.price = product.price;
+                productSelect.appendChild(option);
+            });
+    
+            const priceLabel = document.createElement('label');
+            priceLabel.textContent = 'Preis:';
+            const priceInput = document.createElement('input');
+            priceInput.type = 'number';
+            priceInput.name = 'price';
+            priceInput.step = '0.01';
+            priceInput.required = true;
+            priceInput.value = products[0].price;
+            priceInput.readOnly = true;
+    
+            productSelect.addEventListener('change', function() {
+                const selectedOption = productSelect.options[productSelect.selectedIndex];
+                priceInput.value = selectedOption.dataset.price;
+            });
+    
+            // Add some basic styling to space out the elements
+            productDiv.style.marginBottom = '10px';
+            productSelect.style.width = '150px';
+            priceLabel.style.marginLeft = '20px';
+            priceInput.style.width = '100px';
+    
+            productDiv.appendChild(productSelect);
+            productDiv.appendChild(priceLabel);
+            productDiv.appendChild(priceInput);
+            productList.appendChild(productDiv);
+        }
+    
+        document.getElementById('orderForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const productItems = document.querySelectorAll('.product-item');
+            const orders = [];
+    
+            productItems.forEach(item => {
+                const product = item.querySelector('select[name="product"]').value;
+                const price = parseFloat(item.querySelector('input[name="price"]').value);
+                const quantity = 1; // Default quantity is 1
+                const status = 'neu';
+    
+                orders.push({
+                    table: tableNumber,
+                    product: product,
+                    price: price,
+                    quantity: quantity,
+                    status: status
+                });
+            });
+    
+            fetch('save_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orders)
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log(data);
+                                // Erfolgsmeldung anzeigen
+                                const successMessage = document.createElement('div');
+                successMessage.textContent = 'Bestellung erfolgreich gesendet!';
+                successMessage.style.color = 'green';
+                successMessage.style.fontSize = '18px';
+                successMessage.style.marginTop = '20px';
+                document.getElementById('orderForm').appendChild(successMessage);
+    
+                // Preis vor dem Zurücksetzen des Formulars auslesen
+                const prices = [];
+                productItems.forEach(item => {
+                    prices.push(item.querySelector('input[name="price"]').value);
+                });
+    
+                // Formular zurücksetzen
+                document.getElementById('orderForm').reset();
+    
+                // Preis wieder einsetzen
+                productItems.forEach((item, index) => {
+                    item.querySelector('input[name="price"]').value = prices[index];
+                });
+            })
+            .catch(error => {
+                console.error('Fehler:', error);
+                // Fehlermeldung anzeigen
+                const errorMessage = document.createElement('div');
+                errorMessage.textContent = 'Fehler bei der Bestellung!';
+                errorMessage.style.color = 'red';
+                errorMessage.style.fontSize = '18px';
+                errorMessage.style.marginTop = '20px';
+                document.getElementById('orderForm').appendChild(errorMessage);
+            });
+        });
+    </script>
+</body>
+</html>

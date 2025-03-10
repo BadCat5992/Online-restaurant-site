@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rechnungen</title>
+</head>
+<body>
+    <h1>Rechnungen</h1>
+    <form id="tableForm">
+        <label for="table">Tischnummer:</label>
+        <input type="number" id="table" name="table" required>
+        <button type="submit">Anzeigen</button>
+    </form>
+    <div id="bills"></div>
+
+    <script>
+        document.getElementById('tableForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const tableNumber = document.getElementById('table').value;
+            
+            fetch('get_bills.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table: tableNumber })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const billsDiv = document.getElementById('bills');
+                billsDiv.innerHTML = '';
+                
+                let total = 0;
+                data.forEach(order => {
+                    total += parseFloat(order.price);
+                    const orderDiv = document.createElement('div');
+                    orderDiv.innerHTML = `<p>Produkt: ${order.product}, Preis: ${order.price}€, Status: ${order.status}</p>`;
+                    billsDiv.appendChild(orderDiv);
+                });
+
+                const totalDiv = document.createElement('div');
+                totalDiv.innerHTML = `<p><strong>Gesamtpreis: ${total.toFixed(2)}€</strong></p>`;
+                billsDiv.appendChild(totalDiv);
+
+                const clearButton = document.createElement('button');
+                clearButton.textContent = 'Besitzer gewechselt';
+                clearButton.onclick = function() {
+                    clearOrders(tableNumber);
+                };
+                billsDiv.appendChild(clearButton);
+            })
+            .catch(error => {
+                console.error('Fehler:', error);
+            });
+        });
+
+        function clearOrders(table) {
+            fetch('clear_orders.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ table: table })
+            })
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('bills').innerHTML = 'Bestellungen für Tisch ' + table + ' gelöscht!';
+            })
+            .catch(error => {
+                console.error('Fehler:', error);
+            });
+        }
+    </script>
+</body>
+</html>

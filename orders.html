@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bestellungen</title>
+    <style>
+        .neu {
+            color: black;
+        }
+        .in-arbeit {
+            color: blue;
+        }
+        .erledigt {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bestellungen</h1>
+    <div id="orders"></div>
+
+    <script>
+        function loadOrders() {
+            fetch('orders.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Netzwerkantwort war nicht ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data.length) {
+                        console.log('Keine Bestellungen gefunden.');
+                        return;
+                    }
+                    const orders = data;
+                    const ordersDiv = document.getElementById('orders');
+                    ordersDiv.innerHTML = '';
+                    
+                    const tableOrders = {};
+                    orders.forEach((order, index) => {
+                        if (!tableOrders[order.table]) {
+                            tableOrders[order.table] = [];
+                        }
+                        tableOrders[order.table].push({ ...order, index });
+                    });
+
+                    for (const table in tableOrders) {
+                        const activeOrders = tableOrders[table].filter(order => order.status !== 'erledigt');
+                        if (activeOrders.length > 0) {
+                            const tableDiv = document.createElement('div');
+                            tableDiv.innerHTML = `<h2>Tischnummer: ${table}</h2>`;
+                            
+                            let total = 0;
+                            activeOrders.forEach(order => {
+                                total += parseFloat(order.price);
+                                const orderDiv = document.createElement('div');
+                                orderDiv.className = order.status;
+                                orderDiv.innerHTML = `
+                                    <p>Produkt: ${order.product}, Preis: ${order.price}€, Status: ${order.status}</p>
+                                    <button onclick="updateOrderStatus(${order.index}, 'erledigt')">Erledigt</button>
+                                    <button onclick="updateOrderStatus(${order.index}, 'in-arbeit')">In Arbeit</button>
+                                `;
+                                tableDiv.appendChild(orderDiv);
+                            });
+
+                            const totalDiv = document.createElement('div');
+                            totalDiv.innerHTML = `<p><strong>Gesamtpreis: ${total.toFixed(2)}€</strong></p>`;
+                            tableDiv.appendChild(totalDiv);
+
+                            ordersDiv.appendChild(tableDiv);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Fehler:', error);
+                });
+        }
+
+        function updateOrderStatus(index, status) {
+            fetch('update_order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ index: index, status: status })
+            })
+            .then(response => response.text())
+            .then(data => {
+                loadOrders();
+            })
+            .catch(error => {
+                console.error('Fehler:', error);
+            });
+        }
+
+        setInterval(loadOrders, 1000);
+        loadOrders();
+    </script>
+</body>
+</html>
+
+
